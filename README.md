@@ -1,56 +1,147 @@
-# Welcome to your Expo app 👋
+# SIGEA Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Sistema de Gestão de Espaços Acadêmicos — versão mobile nativa (Android) do
+SIGEA, construída com **Expo Router** e **React Native**. Permite localizar
+salas em um mapa 2D interativo, gerenciar reservas e administrar usuários,
+tudo em um único app.
 
-## Get started
+Este projeto é a migração da versão web do SIGEA (React + Vite + react-router)
+para um app nativo, mantendo a identidade visual original e adicionando CRUD
+completo para salas, reservas e usuários.
 
-1. Install dependencies
+## Índice
 
-   ```bash
-   npm install
-   ```
+- [Funcionalidades](#funcionalidades)
+- [Tecnologias](#tecnologias)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Pré-requisitos](#pré-requisitos)
+- [Instalação](#instalação)
+- [Configuração de ambiente](#configuração-de-ambiente)
+- [Executando o projeto](#executando-o-projeto)
+- [Scripts disponíveis](#scripts-disponíveis)
+- [CRUD implementado](#crud-implementado)
+- [Limitações conhecidas](#limitações-conhecidas)
+- [Equipe](#equipe)
+- [Licença](#licença)
 
-2. Start the app
+## Funcionalidades
 
-   ```bash
-   npx expo start
-   ```
+- 🗺️ **Mapa 2D de salas** por bloco e andar, com status em tempo real
+  (disponível / ocupada / manutenção).
+- ✏️ **Editor de mapa por toque**: monte, mova e remova salas e elementos
+  (corredor, banheiro, escada, entrada, parede) diretamente no celular.
+- 📅 **Gestão de reservas**: criar, concluir, cancelar e excluir reservas, com
+  indicadores de ocupação e sincronização com API externa.
+- 👥 **Gestão de usuários**: cadastro, edição e remoção de usuários, com
+  perfis de acesso (administrador, coordenador, professor, aluno).
+- 🔐 **Autenticação** com sessão persistente opcional ("manter sessão ativa").
+- 🌗 **Tema claro/escuro** automático (segue o sistema), com alternância manual.
 
-In the output, you'll find options to open the app in a
+## Tecnologias
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+| Categoria | Tecnologia |
+|---|---|
+| Framework | [Expo](https://expo.dev) (SDK 56) + [React Native](https://reactnative.dev) |
+| Roteamento | [Expo Router](https://docs.expo.dev/router/introduction/) (file-based) |
+| Estilização | [NativeWind](https://www.nativewind.dev/) (Tailwind CSS para React Native) |
+| Linguagem | TypeScript |
+| HTTP | [axios](https://axios-http.com/) |
+| Persistência local | [@react-native-async-storage/async-storage](https://react-native-async-storage.github.io/async-storage/) |
+| Ícones | [lucide-react-native](https://lucide.dev/) |
+| Gestos/animações | react-native-gesture-handler, react-native-reanimated |
+| Outros | expo-linear-gradient, @react-native-community/datetimepicker |
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Veja a justificativa de cada escolha técnica em [APRESENTACAO.md](./APRESENTACAO.md).
 
-## Get a fresh project
+## Estrutura do projeto
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+src/
+├── app/            # Rotas (Expo Router): login, tabs (Início/Cadastro/Reservas/Usuários)
+├── components/      # Componentes de tela + design system (components/ui)
+├── contexts/          # AuthContext (autenticação)
+├── data/               # Camada de dados/CRUD (roomsApi, reservationsApi, usersApi)
+├── services/            # Cliente HTTP (authService)
+├── hooks/                # useFloorMap, useBlocks, useFloors
+├── lib/                   # Helpers (cn, mixedChildren)
+└── theme/                  # Cores de marca
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Diagrama completo de pastas e fluxo de dados em [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-### Other setup steps
+## Pré-requisitos
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- [Node.js](https://nodejs.org/) 20 ou superior
+- npm (instalado junto com o Node.js)
+- App **[Expo Go](https://expo.dev/go)** instalado no celular Android (para
+  testar sem precisar de Android Studio), ou um emulador Android configurado
 
-## Learn more
+## Instalação
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+git clone <url-do-repositorio>
+cd sigeaMobileNovo/sigeaMobile
+npm install
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Configuração de ambiente
 
-## Join the community
+Copie o arquivo de exemplo e ajuste se necessário:
 
-Join our community of developers creating universal apps.
+```bash
+cp .env.example .env
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+| Variável | Descrição | Padrão |
+|---|---|---|
+| `EXPO_PUBLIC_HOST_API` | URL base da API de autenticação/usuários | `https://api.sigea.fun` |
+
+## Executando o projeto
+
+```bash
+npx expo start
+```
+
+No terminal vai aparecer um QR code:
+
+- **Celular Android**: escaneie o QR code com o app Expo Go.
+- **Emulador Android**: pressione `a` no terminal (requer Android Studio configurado).
+- **Web** (preview rápido no navegador, sem todos os recursos nativos): `npm run web`.
+
+## Scripts disponíveis
+
+| Comando | Descrição |
+|---|---|
+| `npm run start` | Inicia o servidor de desenvolvimento (Metro) |
+| `npm run android` | Inicia e abre no emulador/dispositivo Android |
+| `npm run web` | Inicia a versão web (react-native-web) |
+| `npm run lint` | Executa o lint do Expo |
+| `npx tsc --noEmit` | Verifica os tipos TypeScript sem gerar build |
+
+## CRUD implementado
+
+| Entidade | Criar | Ler | Atualizar | Excluir |
+|---|---|---|---|---|
+| Salas | ✅ paleta no mapa / diálogo "Nova Sala" | ✅ | ✅ detalhes dinâmicos | ✅ |
+| Reservas | ✅ diálogo "Nova Reserva" | ✅ | ✅ concluir/cancelar | ✅ |
+| Usuários | ✅ | ✅ | ✅ | ✅ |
+
+## Limitações conhecidas
+
+- **Salas e reservas** ainda usam uma camada de dados em memória (mock) — a
+  estrutura já está pronta em `src/data/` para ser trocada por chamadas reais
+  de API sem alterar as telas.
+- **Usuários** já consomem a API real do projeto (`https://api.sigea.fun`).
+- A geração da build nativa final (`.apk`/`.aab`) via **EAS Build** ou
+  **Android Studio local** ainda não foi configurada neste repositório.
+
+## Equipe
+
+Projeto desenvolvido por: Nicolas Wolf, Vinicius Antonio Lourençon, Ryan Lopes
+Hadas, Guilherme Alves Bispo, Fillype Oliveira Amorim e Jonathan Patrocínio
+dos Santos.
+
+## Licença
+
+Projeto acadêmico desenvolvido para fins educacionais. Consulte o arquivo
+[LICENSE](./LICENSE) para mais detalhes.
